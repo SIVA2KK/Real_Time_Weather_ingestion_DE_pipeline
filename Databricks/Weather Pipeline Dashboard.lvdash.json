@@ -1,0 +1,523 @@
+{
+  "datasets": [
+    {
+      "name": "3f09bdf2",
+      "displayName": "Hourly Temperature Data",
+      "queryLines": [
+        "SELECT\n",
+        "  city_name,\n",
+        "  hour_window,\n",
+        "  avg_temp\n",
+        "FROM\n",
+        "  workspace.weather_gold.hourly\n",
+        "ORDER BY\n",
+        "  hour_window;"
+      ]
+    },
+    {
+      "name": "ca5fd35b",
+      "displayName": "Current temperature bar chart",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT city_name, temperature_celsius, temp_category\r\nFROM workspace.weather_gold.snapshot\r\nORDER BY temperature_celsius DESC",
+        "dimensions": [
+          {
+            "name": "city_name",
+            "expr": "source.city_name",
+            "displayName": "City Name"
+          },
+          {
+            "name": "temperature_celsius",
+            "expr": "source.temperature_celsius",
+            "displayName": "Temperature Celsius"
+          },
+          {
+            "name": "temp_category",
+            "expr": "source.temp_category",
+            "displayName": "Temp Category"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "02068aeb",
+      "displayName": "Comfort level pie",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT comfort_level, COUNT(*) AS city_count\r\nFROM workspace.weather_gold.snapshot\r\nGROUP BY comfort_level",
+        "dimensions": [
+          {
+            "name": "comfort_level",
+            "expr": "source.comfort_level",
+            "displayName": "Comfort Level"
+          },
+          {
+            "name": "city_count",
+            "expr": "source.city_count",
+            "displayName": "City Count"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "2643075f",
+      "displayName": "Live conditions table",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT\r\n  city_name,\r\n  ROUND(temperature_celsius, 1)  AS temp_c,\r\n  humidity_pct                   AS humidity,\r\n  wind_speed_mps                 AS wind_mps,\r\n  wind_direction_label           AS wind_dir,\r\n  weather_description,\r\n  comfort_level,\r\n  CASE WHEN is_daytime THEN 'Day' ELSE 'Night' END AS time_of_day\r\nFROM workspace.weather_gold.snapshot\r\nORDER BY temperature_celsius DESC",
+        "dimensions": [
+          {
+            "name": "city_name",
+            "expr": "source.city_name",
+            "displayName": "City Name"
+          },
+          {
+            "name": "temp_c",
+            "expr": "source.temp_c",
+            "displayName": "Temp C"
+          },
+          {
+            "name": "humidity",
+            "expr": "source.humidity",
+            "displayName": "Humidity"
+          },
+          {
+            "name": "wind_mps",
+            "expr": "source.wind_mps",
+            "displayName": "Wind Mps"
+          },
+          {
+            "name": "wind_dir",
+            "expr": "source.wind_dir",
+            "displayName": "Wind Dir"
+          },
+          {
+            "name": "weather_description",
+            "expr": "source.weather_description",
+            "displayName": "Weather Description"
+          },
+          {
+            "name": "comfort_level",
+            "expr": "source.comfort_level",
+            "displayName": "Comfort Level"
+          },
+          {
+            "name": "time_of_day",
+            "expr": "source.time_of_day",
+            "displayName": "Time Of Day"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "a7e826e2",
+      "displayName": "Rainfall bar chart",
+      "config": {
+        "version": "1.1",
+        "source": "SELECT city_name, SUM(total_rain_mm) AS total_rainfall_mm\r\nFROM workspace.weather_gold.hourly\r\nGROUP BY city_name\r\nORDER BY total_rainfall_mm DESC",
+        "dimensions": [
+          {
+            "name": "city_name",
+            "expr": "source.city_name",
+            "displayName": "City Name"
+          },
+          {
+            "name": "total_rainfall_mm",
+            "expr": "source.total_rainfall_mm",
+            "displayName": "Total Rainfall Mm"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "7bc7b140",
+      "displayName": "Untitled page",
+      "layout": [
+        {
+          "widget": {
+            "name": "current",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ca5fd35b",
+                  "fields": [
+                    {
+                      "name": "temp_category",
+                      "expression": "`temp_category`"
+                    },
+                    {
+                      "name": "city_name",
+                      "expression": "`city_name`"
+                    },
+                    {
+                      "name": "temperature_celsius",
+                      "expression": "`temperature_celsius`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Current Temperature"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "city_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "temperature_celsius",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "temp_category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "l",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2643075f",
+                  "fields": [
+                    {
+                      "name": "city_name",
+                      "expression": "`city_name`"
+                    },
+                    {
+                      "name": "temp_c",
+                      "expression": "`temp_c`"
+                    },
+                    {
+                      "name": "humidity",
+                      "expression": "`humidity`"
+                    },
+                    {
+                      "name": "wind_mps",
+                      "expression": "`wind_mps`"
+                    },
+                    {
+                      "name": "wind_dir",
+                      "expression": "`wind_dir`"
+                    },
+                    {
+                      "name": "weather_description",
+                      "expression": "`weather_description`"
+                    },
+                    {
+                      "name": "comfort_level",
+                      "expression": "`comfort_level`"
+                    },
+                    {
+                      "name": "time_of_day",
+                      "expression": "`time_of_day`"
+                    },
+                    {
+                      "name": "measure(count)",
+                      "expression": "MEASURE(`count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Live Condition Table"
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "city_name"
+                  },
+                  {
+                    "fieldName": "temp_c"
+                  },
+                  {
+                    "fieldName": "humidity"
+                  },
+                  {
+                    "fieldName": "wind_mps"
+                  },
+                  {
+                    "fieldName": "wind_dir"
+                  },
+                  {
+                    "fieldName": "weather_description"
+                  },
+                  {
+                    "fieldName": "comfort_level"
+                  },
+                  {
+                    "fieldName": "time_of_day"
+                  },
+                  {
+                    "fieldName": "measure(count)"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 8,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "ra",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a7e826e2",
+                  "fields": [
+                    {
+                      "name": "countdistinct(city_name)",
+                      "expression": "COUNT(DISTINCT `city_name`)"
+                    },
+                    {
+                      "name": "city_name",
+                      "expression": "`city_name`"
+                    },
+                    {
+                      "name": "total_rainfall_mm",
+                      "expression": "`total_rainfall_mm`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Rainfall"
+              },
+              "widgetType": "waterfall",
+              "encodings": {
+                "x": {
+                  "fieldName": "city_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "total_rainfall_mm",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "countdistinct(city_name)",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "redblue"
+                    },
+                    "domain": {
+                      "mid": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "comfort",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "02068aeb",
+                  "fields": [
+                    {
+                      "name": "countdistinct(comfort_level)",
+                      "expression": "COUNT(DISTINCT `comfort_level`)"
+                    },
+                    {
+                      "name": "city_count",
+                      "expression": "`city_count`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Comfort Level Pie"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "countdistinct(comfort_level)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "city_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 6,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "hourly",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3f09bdf2",
+                  "fields": [
+                    {
+                      "name": "city_name",
+                      "expression": "`city_name`"
+                    },
+                    {
+                      "name": "hour_window",
+                      "expression": "`hour_window`"
+                    },
+                    {
+                      "name": "sum(avg_temp)",
+                      "expression": "SUM(`avg_temp`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Hourly Trend Line Chart"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "hour_window",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(avg_temp)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "city_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 6,
+            "width": 4,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
